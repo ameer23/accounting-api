@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-use laravel\Sanctum\HasApiTokens;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;

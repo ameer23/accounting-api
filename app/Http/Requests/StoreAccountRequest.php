@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\AccountType; 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAccountRequest extends FormRequest
 {
@@ -11,7 +13,7 @@ class StoreAccountRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +24,8 @@ class StoreAccountRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:255', 'unique:accounts,name'],
+            'type' => ['required', Rule::enum(AccountType::class)],
         ];
     }
 }

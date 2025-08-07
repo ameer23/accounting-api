@@ -3,47 +3,54 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreAccountRequest;
+use App\Http\Resources\AccountResource;
+use App\Models\Account;
+use App\Models\Entry;
+use Illuminate\Http\JsonResponse;
+use App\Enums\AccountType;
 
 class AccountController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+   
+    public function index(): JsonResponse
     {
-        //
+        $accounts = Account::all();
+        return response()->json(AccountResource::collection($accounts));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+   
+    public function store(StoreAccountRequest $request): JsonResponse
     {
-        //
+        $account = Account::create($request->validated());
+        return response()->json(new AccountResource($account), 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    
+    public function balance(Account $account): JsonResponse
     {
-        //
-    }
+        $debits = Entry::where('account_id', $account->id)->where('type', 'debit')->sum('amount');
+        $credits = Entry::where('account_id', $account->id)->where('type', 'credit')->sum('amount');
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        $balance = 0;
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        switch ($account->type) {
+            case AccountType::Asset:
+            case AccountType::Expense:
+                $balance = $debits - $credits;
+                break;
+
+            case AccountType::Liability:
+            case AccountType::Equity:
+            case AccountType::Income:
+                $balance = $credits - $debits;
+                break;
+        }
+
+        return response()->json([
+            'balance' => number_format($balance, 2, '.', ''),
+            'account_type' => $account->type->value,
+            'account_name' => $account->name
+        ]);
     }
 }
