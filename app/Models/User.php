@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -48,4 +49,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+    public function transactions(): HasMany {
+    return $this->hasMany(Transaction::class, 'created_by');
+}
 }
