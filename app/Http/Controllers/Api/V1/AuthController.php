@@ -42,7 +42,6 @@ class AuthController extends Controller
         $credentials = $request->validated();
 
         if (!Auth::attempt($credentials)) {
-            // Using 401 Unauthorized is the standard for failed login attempts.
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 

@@ -1,9 +1,9 @@
 <?php
 
-// Correct controller imports for the accounting project
+
 use App\Http\Controllers\Api\V1\AccountController;
 use App\Http\Controllers\Api\V1\TransactionController;
-use App\Http\Controllers\Api\V1\AuthController; // Assuming you moved it
+use App\Http\Controllers\Api\V1\AuthController; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

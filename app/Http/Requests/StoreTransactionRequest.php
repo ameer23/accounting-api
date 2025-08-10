@@ -39,10 +39,8 @@ class StoreTransactionRequest extends FormRequest
     {
         return [
             function (Validator $validator) {
-                // Get the entries after initial validation passes
                 $entries = $validator->safe()->entries;
 
-                // If initial validation fails, $entries might not exist.
                 if (empty($entries) || count($entries) !== 2) {
                     return;
                 }
@@ -50,7 +48,6 @@ class StoreTransactionRequest extends FormRequest
                 $entry1 = $entries[0];
                 $entry2 = $entries[1];
 
-                // Rule 1: Amounts must be equal
                 if ($entry1['amount'] !== $entry2['amount']) {
                     $validator->errors()->add(
                         'entries',
@@ -58,7 +55,6 @@ class StoreTransactionRequest extends FormRequest
                     );
                 }
 
-                // Rule 2: Must have one debit and one credit
                 if ($entry1['type'] === $entry2['type']) {
                     $validator->errors()->add(
                         'entries',

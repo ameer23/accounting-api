@@ -6,23 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\JsonResponse;
 
 class TransactionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(): JsonResponse
+ 
+    public function index(Request $request): AnonymousResourceCollection
     {
-        $transactions = auth()->user()->transactions()->with('entries')->latest()->paginate(15);
+        $query = auth()->user()->transactions()->with('entries')->latest();
 
-        return response()->json(TransactionResource::collection($transactions));
+        if ($request->has('date_from') && $request->has('date_to')) {
+            $query->whereBetween('created_at', [$request->date_from, $request->date_to]);
+        }
+        if ($request->has('account_id')) {
+            $query->whereHas('entries', fn ($q) => $q->where('account_id', $request->account_id));
+        }
+        
+        $transactions = $query->paginate(15)->withQueryString();
+
+        return TransactionResource::collection($transactions);
     }
 
-    
-    public function store(StoreTransactionRequest $request): JsonResponse
+
+    public function store(StoreTransactionRequest $request): TransactionResource
     {
         $validatedData = $request->validated();
 
@@ -30,16 +38,14 @@ class TransactionController extends Controller
             $transaction = auth()->user()->transactions()->create([
                 'reference' => $validatedData['reference'],
                 'description' => $validatedData['description'] ?? null,
+                'status' => \App\Enums\TransactionStatus::Posted, 
             ]);
 
             $transaction->entries()->createMany($validatedData['entries']);
 
             return $transaction;
         });
-
-        return response()->json(
-            new TransactionResource($transaction->load('entries')),
-            201 
-        );
+        
+        return new TransactionResource($transaction->load('entries'));
     }
 }

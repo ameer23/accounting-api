@@ -28,4 +28,11 @@ class RegisterRequest extends FormRequest
         ];
     
     }
+
+    public function messages(): array
+    {
+        return [
+            'name'=> 'name has been required',
+        ];
+    }
 }

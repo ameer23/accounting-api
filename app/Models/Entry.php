@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Enums\EntryType;
 
 class Entry extends Model
 {
@@ -36,4 +37,11 @@ class Entry extends Model
     {
         return $this->belongsTo(Transaction::class);
     }
+
+    protected function casts(): array
+{
+    return [
+        'type' => EntryType::class,
+    ];
+}
 }
