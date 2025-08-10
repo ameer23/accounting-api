@@ -18,6 +18,8 @@ class TransactionResource extends JsonResource
             'id' => $this->id,
             'reference' => $this->reference,
             'description' => $this->description,
+            'status' => $this->status, 
+            'amount' => $this->amount,
             'created_by' => $this->created_by,
             'created_at' => $this->created_at,
             'entries' => EntryResource::collection($this->whenLoaded('entries')),
